@@ -1,0 +1,6 @@
+{
+  "name": "SkillIssue.ai",
+  "description": "AI-powered career intelligence platform providing resume audits, recruiter red flags, skill gap detection, and personalized career roadmaps.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
