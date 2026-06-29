@@ -51,7 +51,7 @@ Set these environment variables on your host:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `GEMINI_API_KEY` | Yes | Google Gemini API key |
-| `VITE_GOOGLE_CLIENT_ID` | Yes | Google OAuth Web Client ID (for Sign-In button) |
+| `GOOGLE_CLIENT_ID` | Yes | Google OAuth Web Client ID |
 | `NODE_ENV` | Yes | Set to `production` |
 | `PORT` | Auto | Assigned by most hosts (defaults to 3000) |
 | `APP_URL` | No | Public URL of your deployment |
@@ -68,8 +68,7 @@ A `render.yaml` blueprint is included for one-click Render deploys.
 3. Add **Authorized JavaScript origins**:
    - `http://localhost:3000` (local)
    - `https://your-app.onrender.com` (production)
-4. Copy the Client ID into `VITE_GOOGLE_CLIENT_ID`
-5. Redeploy after changing this variable (Vite bakes it in at build time)
+4. Copy the Client ID into `GOOGLE_CLIENT_ID` on Render (no rebuild needed — loaded at runtime)
 
 ## Environment Variables
 

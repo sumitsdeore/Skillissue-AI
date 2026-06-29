@@ -173,6 +173,15 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "alive", timestamp: new Date().toISOString() });
 });
 
+app.get("/api/config", (_req, res) => {
+  res.json({
+    googleClientId:
+      process.env.GOOGLE_CLIENT_ID ||
+      process.env.VITE_GOOGLE_CLIENT_ID ||
+      "",
+  });
+});
+
 // Primary Career Resume Analysis Route
 app.post("/api/analyze", async (req, res) => {
   const { pdfBase64, fileName } = req.body;
