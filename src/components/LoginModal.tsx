@@ -5,6 +5,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import Logo from "./Logo";
+import AuthSuccessScreen from "./AuthSuccessScreen";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -46,9 +47,14 @@ export default function LoginModal({
 }: LoginModalProps) {
   const [error, setError] = useState<string | null>(null);
   const [taglineIdx, setTaglineIdx] = useState(0);
+  const [successUser, setSuccessUser] = useState<{ email: string; name: string } | null>(null);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setSuccessUser(null);
+      setError(null);
+      return;
+    }
     const timer = setInterval(() => {
       setTaglineIdx((i) => (i + 1) % ROTATING_TAGLINES.length);
     }, 3200);
@@ -68,12 +74,27 @@ export default function LoginModal({
         return;
       }
       setError(null);
-      onLoginSuccess(email, name);
-      onClose();
+      setSuccessUser({ email, name });
     } catch {
       setError("Failed to process Google sign-in. Please try again.");
     }
   };
+
+  const handleSuccessComplete = () => {
+    if (!successUser) return;
+    onLoginSuccess(successUser.email, successUser.name);
+    setSuccessUser(null);
+    onClose();
+  };
+
+  if (successUser) {
+    return (
+      <AuthSuccessScreen
+        userName={successUser.name}
+        onComplete={handleSuccessComplete}
+      />
+    );
+  }
 
   return (
     <AnimatePresence>
