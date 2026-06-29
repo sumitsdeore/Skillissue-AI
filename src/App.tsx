@@ -16,8 +16,13 @@ import LoginModal from "./components/LoginModal";
 import IntroOverlay from "./components/IntroOverlay";
 import { sampleReport } from "./data/sampleReport";
 import { CareerReport, ViewState } from "./types";
+import { clearAuth, clearLegacyAuth, getStoredAuth, saveAuth } from "./utils/authStorage";
 
-export default function App() {
+interface AppProps {
+  googleAuthEnabled?: boolean;
+}
+
+export default function App({ googleAuthEnabled = false }: AppProps) {
   const [view, setView] = useState<ViewState>(() => {
     try {
       const savedView = localStorage.getItem("skillissue_view");
@@ -54,28 +59,18 @@ export default function App() {
   const [isStoryOpen, setIsStoryOpen] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
 
-  // Authentication states
-  const [userEmail, setUserEmail] = useState<string | null>(() => {
-    try {
-      return localStorage.getItem("skillissue_user_email");
-    } catch {
-      return null;
-    }
-  });
-  const [userName, setUserName] = useState<string | null>(() => {
-    try {
-      return localStorage.getItem("skillissue_user_name") || "Developer";
-    } catch {
-      return "Developer";
-    }
-  });
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(() => {
-    try {
-      return !localStorage.getItem("skillissue_user_email");
-    } catch {
-      return true;
-    }
-  });
+  // Authentication — session only (clears when browser tab/session ends)
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(true);
+
+  useEffect(() => {
+    clearLegacyAuth();
+    const { email, name } = getStoredAuth();
+    setUserEmail(email);
+    setUserName(name);
+    setIsLoginModalOpen(!email);
+  }, []);
 
   // Synchronise state to localStorage
   useEffect(() => {
@@ -125,12 +120,7 @@ export default function App() {
   const handleLoginSuccess = (email: string, name: string) => {
     setUserEmail(email);
     setUserName(name);
-    try {
-      localStorage.setItem("skillissue_user_email", email);
-      localStorage.setItem("skillissue_user_name", name);
-    } catch (e) {
-      console.warn("Storage quotas exceeded or blocked:", e);
-    }
+    saveAuth(email, name);
   };
 
   const handleLogout = () => {
@@ -141,9 +131,8 @@ export default function App() {
     setPdfBase64(null);
     setFileName(null);
     setIsDemo(false);
+    clearAuth();
     try {
-      localStorage.removeItem("skillissue_user_email");
-      localStorage.removeItem("skillissue_user_name");
       localStorage.removeItem("skillissue_view");
       localStorage.removeItem("skillissue_report");
       localStorage.removeItem("skillissue_pdf_base64");
@@ -690,6 +679,7 @@ export default function App() {
             onClose={() => setIsLoginModalOpen(false)} 
             onLoginSuccess={handleLoginSuccess}
             allowClose={!!userEmail}
+            googleAuthEnabled={googleAuthEnabled}
           />
         )}
       </AnimatePresence>

@@ -46,7 +46,7 @@ export default function Header({
                 {userInitials}
               </div>
               <span className="text-[11px] font-mono text-zinc-300 font-bold hidden sm:inline max-w-[100px] truncate">
-                {userName || "Sumit Deore"}
+                {userName || "User"}
               </span>
               <button
                 onClick={onLogout}

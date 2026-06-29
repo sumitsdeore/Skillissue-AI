@@ -1,10 +1,19 @@
-import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import App from "./App.tsx";
+import "./index.css";
 
-createRoot(document.getElementById('root')!).render(
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
+    {googleClientId ? (
+      <GoogleOAuthProvider clientId={googleClientId}>
+        <App googleAuthEnabled />
+      </GoogleOAuthProvider>
+    ) : (
+      <App googleAuthEnabled={false} />
+    )}
+  </StrictMode>
 );
