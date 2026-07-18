@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { CheckCircle2, Sparkles } from "lucide-react";
 import Logo from "./Logo";
+
+const AUTH_SUCCESS_DURATION_MS = 5000;
 
 interface AuthSuccessScreenProps {
   userName: string;
@@ -19,23 +21,27 @@ const GoogleLogo = () => (
 
 export default function AuthSuccessScreen({ userName, onComplete }: AuthSuccessScreenProps) {
   const [progress, setProgress] = useState(0);
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     const start = Date.now();
-    const duration = 3200;
 
     const tick = setInterval(() => {
       const elapsed = Date.now() - start;
-      const pct = Math.min(100, (elapsed / duration) * 100);
+      const pct = Math.min(100, (elapsed / AUTH_SUCCESS_DURATION_MS) * 100);
       setProgress(pct);
-      if (elapsed >= duration) {
+      if (elapsed >= AUTH_SUCCESS_DURATION_MS) {
         clearInterval(tick);
-        onComplete();
+        onCompleteRef.current();
       }
     }, 30);
 
     return () => clearInterval(tick);
-  }, [onComplete]);
+  }, []);
 
   const firstName = userName.split(" ")[0] || userName;
 

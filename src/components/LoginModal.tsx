@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   X, Shield, Lock, Sparkles, Zap, Target, MessageSquare, ChevronRight,
 } from "lucide-react";
@@ -55,11 +55,12 @@ export default function LoginModal({
       setError(null);
       return;
     }
+    if (successUser) return;
     const timer = setInterval(() => {
       setTaglineIdx((i) => (i + 1) % ROTATING_TAGLINES.length);
     }, 3200);
     return () => clearInterval(timer);
-  }, [isOpen]);
+  }, [isOpen, successUser]);
 
   const handleGoogleSuccess = (response: CredentialResponse) => {
     if (!response.credential) {
@@ -80,12 +81,14 @@ export default function LoginModal({
     }
   };
 
-  const handleSuccessComplete = () => {
-    if (!successUser) return;
-    onLoginSuccess(successUser.email, successUser.name);
-    setSuccessUser(null);
-    onClose();
-  };
+  const handleSuccessComplete = useCallback(() => {
+    setSuccessUser((current) => {
+      if (!current) return null;
+      onLoginSuccess(current.email, current.name);
+      onClose();
+      return null;
+    });
+  }, [onLoginSuccess, onClose]);
 
   if (successUser) {
     return (
